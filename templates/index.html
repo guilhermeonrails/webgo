@@ -29,24 +29,14 @@
                 </tr>
             </thead>
             <tbody>
+                {{range .}}
                 <tr>
-                    <td>Camiseta</td>
-                    <td>Muito bonita</td>
-                    <td>29.99</td>
-                    <td>10</td>
+                    <td>{{.Nome}}</td>
+                    <td>{{.Descricao}}</td>
+                    <td>{{.Preco}}</td>
+                    <td>{{.Quantidade}}</td>
                 </tr>
-                <tr>
-                    <td>Notebook</td>
-                    <td>Muito Rápido</td>
-                    <td>1999.90</td>
-                    <td>2</td>
-                </tr>
-                <tr>
-                    <td>Lápis</td>
-                    <td>Bom para desenhos profissionais</td>
-                    <td>9.90</td>
-                    <td>20</td>
-                    </tr>
+                {{end}}
             </tbody>
         </table>
     </div>
