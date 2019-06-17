@@ -9,5 +9,6 @@ import (
 
 func main() {
 	http.HandleFunc("/", controllers.Index)
+	http.HandleFunc("/new", controllers.New)
 	http.ListenAndServe(":8000", nil)
 }
