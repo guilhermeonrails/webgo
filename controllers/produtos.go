@@ -63,8 +63,23 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 			panic(err.Error())
 		}
 		insForm.Exec(nome, descricao, preco, quantidade)
-		log.Println("Detalhes do novo produto:", nome, descricao, preco, quantidade)
+		log.Println("Inserindo novo produto:", nome, descricao, preco, quantidade)
 	}
+	defer db.Close()
+	http.Redirect(w, r, "/", 301)
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	db := db.ConectaComBancoDeDados()
+	idDoProduto := r.URL.Query().Get("id")
+
+	delForm, err := db.Prepare("delete from produtos WHERE id=$1")
+	if err != nil {
+		panic(err.Error())
+	}
+	delForm.Exec(idDoProduto)
+	log.Println("Deletando o produto com ID:", idDoProduto)
+
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
 }
