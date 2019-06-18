@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"text/template"
 
@@ -46,4 +47,24 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 func New(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "New", nil)
+}
+
+func Insert(w http.ResponseWriter, r *http.Request) {
+	db := db.ConectaComBancoDeDados()
+	if r.Method == "POST" {
+
+		nome := r.FormValue("nome")
+		descricao := r.FormValue("descricao")
+		preco := r.FormValue("preco")
+		quantidade := r.FormValue("quantidade")
+
+		insForm, err := db.Prepare("INSERT INTO produtos(nome, descricao, preco, quantidade) VALUES($1,$2,$3,$4)")
+		if err != nil {
+			panic(err.Error())
+		}
+		insForm.Exec(nome, descricao, preco, quantidade)
+		log.Println("Detalhes do novo produto:", nome, descricao, preco, quantidade)
+	}
+	defer db.Close()
+	http.Redirect(w, r, "/", 301)
 }
