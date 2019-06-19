@@ -21,7 +21,7 @@
                     <td>{{.Descricao}}</td>
                     <td>{{.Preco}}</td>
                     <td>{{.Quantidade}}</td>
-                    <td><button onclick="onDelete({{ .Id }})" class="btn btn-danger">Deletar</button></td>
+                    <td><button onclick="onDelete('{{.Id}}')" class="btn btn-danger">Deletar</button></td>
                 </tr>
                 {{end}}
             </tbody>
