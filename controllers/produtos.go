@@ -3,46 +3,17 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"text/template"
 
-	"github.com/guilhermelima/crudComGo/db"
 	"github.com/guilhermelima/crudComGo/models"
 )
 
 var tmpl = template.Must(template.ParseGlob("templates/*"))
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	db := db.ConectaComBancoDeDados()
-
-	selectDB, err := db.Query("SELECT * FROM produtos")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	p := models.Produto{}
-	dados := []models.Produto{}
-
-	for selectDB.Next() {
-		var id int
-		var nome, descricao string
-		var preco float32
-		var quantidade int
-
-		err = selectDB.Scan(&id, &nome, &descricao, &preco, &quantidade)
-		if err != nil {
-			panic(err.Error())
-		}
-		p.Id = id
-		p.Nome = nome
-		p.Descricao = descricao
-		p.Preco = preco
-		p.Quantidade = quantidade
-
-		// Junta a Struct com Array
-		dados = append(dados, p)
-	}
-	tmpl.ExecuteTemplate(w, "Index", dados)
-	defer db.Close()
+	todosOsProdutos := models.BuscaTodosProdutos()
+	tmpl.ExecuteTemplate(w, "Index", todosOsProdutos)
 }
 
 func New(w http.ResponseWriter, r *http.Request) {
@@ -50,36 +21,29 @@ func New(w http.ResponseWriter, r *http.Request) {
 }
 
 func Insert(w http.ResponseWriter, r *http.Request) {
-	db := db.ConectaComBancoDeDados()
 	if r.Method == "POST" {
-
 		nome := r.FormValue("nome")
 		descricao := r.FormValue("descricao")
 		preco := r.FormValue("preco")
 		quantidade := r.FormValue("quantidade")
 
-		insForm, err := db.Prepare("INSERT INTO produtos(nome, descricao, preco, quantidade) VALUES($1,$2,$3,$4)")
+		precoF, err := strconv.ParseFloat(preco, 64)
 		if err != nil {
-			panic(err.Error())
+			log.Println("Erro na conversão:", err)
 		}
-		insForm.Exec(nome, descricao, preco, quantidade)
-		log.Println("Inserindo novo produto:", nome, descricao, preco, quantidade)
+
+		quantidadeI, err := strconv.Atoi(quantidade)
+		if err != nil {
+			log.Println("Erro na conversão:", err)
+		}
+
+		models.CriaNovoProduto(nome, descricao, precoF, quantidadeI)
 	}
-	defer db.Close()
 	http.Redirect(w, r, "/", 301)
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
-	db := db.ConectaComBancoDeDados()
 	idDoProduto := r.URL.Query().Get("id")
-
-	delForm, err := db.Prepare("delete from produtos WHERE id=$1")
-	if err != nil {
-		panic(err.Error())
-	}
-	delForm.Exec(idDoProduto)
-	log.Println("Deletando o produto com ID:", idDoProduto)
-
-	defer db.Close()
+	models.DeletaProduto(idDoProduto)
 	http.Redirect(w, r, "/", 301)
 }
