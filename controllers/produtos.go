@@ -27,17 +27,17 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 		preco := r.FormValue("preco")
 		quantidade := r.FormValue("quantidade")
 
-		precoF, err := strconv.ParseFloat(preco, 64)
+		precoConvertido, err := strconv.ParseFloat(preco, 64)
 		if err != nil {
 			log.Println("Erro na conversão:", err)
 		}
 
-		quantidadeI, err := strconv.Atoi(quantidade)
+		quantidadeConvertida, err := strconv.Atoi(quantidade)
 		if err != nil {
 			log.Println("Erro na conversão:", err)
 		}
 
-		models.CriaNovoProduto(nome, descricao, precoF, quantidadeI)
+		models.CriaNovoProduto(nome, descricao, precoConvertido, quantidadeConvertida)
 	}
 	http.Redirect(w, r, "/", 301)
 }
@@ -45,5 +45,44 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 func Delete(w http.ResponseWriter, r *http.Request) {
 	idDoProduto := r.URL.Query().Get("id")
 	models.DeletaProduto(idDoProduto)
+	http.Redirect(w, r, "/", 301)
+}
+
+func Edit(w http.ResponseWriter, r *http.Request) {
+	idDoProduto := r.URL.Query().Get("id")
+	idDoProdutoConvertido, err := strconv.Atoi(idDoProduto)
+	if err != nil {
+		log.Println("Erro na conversão:", err)
+	}
+	produto := models.EditaProduto(idDoProdutoConvertido)
+	tmpl.ExecuteTemplate(w, "Edit", produto)
+}
+
+func Update(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		idDoProduto := r.FormValue("id")
+		nome := r.FormValue("nome")
+		descricao := r.FormValue("descricao")
+		preco := r.FormValue("preco")
+		quantidade := r.FormValue("quantidade")
+
+		idDoProdutoConvertido, err := strconv.Atoi(idDoProduto)
+		if err != nil {
+			log.Println("Erro na conversão:", err)
+		}
+
+		precoConvertido, err := strconv.ParseFloat(preco, 64)
+		if err != nil {
+			log.Println("Erro na conversão:", err)
+		}
+
+		quantidadeConvertida, err := strconv.Atoi(quantidade)
+		if err != nil {
+			log.Println("Erro na conversão:", err)
+		}
+
+		models.AtualizaProduto(idDoProdutoConvertido, nome, descricao, precoConvertido, quantidadeConvertida)
+	}
+
 	http.Redirect(w, r, "/", 301)
 }
