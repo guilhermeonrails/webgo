@@ -9,5 +9,5 @@ import (
 
 func main() {
 	routes.CarregarRotas()
-	http.ListenAndServe(":8000", nil)
+	http.ListenAndServe(":3001", nil)
 }
